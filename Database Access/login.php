@@ -1,23 +1,25 @@
 <?php
    include("config.php");
-   
+   include("logger.php");
+
    session_start();
-   
+
    if($_SERVER["REQUEST_METHOD"] == "POST") {
       $myusername = $_POST['name'];
       $mydepartment = $_POST['department'];
-    
-      
+
+      app_log('INFO', 'Login attempt received', array('name' => $myusername, 'department' => $mydepartment));
+
       $sql = "SELECT * FROM prashan WHERE name = '".$myusername."' and department = '".$mydepartment."'";
-   
+
       $result = mysqli_query($conn,$sql);
 
       $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
       echo $row['active'];
     $count = mysqli_num_rows($result);
-      
-      
-		
+
+
+
       if($count == 1) {
           echo "hello";
            header("Location: index.php");
@@ -25,10 +27,11 @@
 
          $_SESSION['login_user'] = $myusername;
 
-         
-         
+         app_log('INFO', 'Login successful, session created', array('name' => $myusername, 'session_id' => session_id()));
+
       }else {
          $error = "Invalid Credentials";
+         app_log('WARNING', 'Login failed: invalid credentials', array('name' => $myusername, 'department' => $mydepartment));
       }
    }
 ?>
